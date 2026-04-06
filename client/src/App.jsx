@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import './App.css';
 
+const USE_BACKEND = import.meta.env.VITE_USE_BACKEND === 'true';
+
 const BUTTONS = [
   ['Clear', 'Backspace', '%', '÷'],
   ['7', '8', '9', 'x'],
@@ -9,7 +11,7 @@ const BUTTONS = [
   ['+/-', '0', '.', '='],
 ];
 
-function calculate(expression) {
+function calculateLocally(expression) {
   try {
     const expr = expression
       .replace(/x/g, '*')
@@ -31,11 +33,22 @@ function calculate(expression) {
   }
 }
 
+async function calculateViaBackend(expression) {
+  const res = await fetch('/api/calculate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ expression }),
+  });
+  if (!res.ok) return 'Error';
+  const data = await res.json();
+  return data.result;
+}
+
 export default function App() {
   const [expression, setExpression] = useState('');
   const [display, setDisplay] = useState('0');
 
-  function handleButton(label) {
+  async function handleButton(label) {
     if (label === 'Clear') {
       setExpression('');
       setDisplay('0');
@@ -60,7 +73,12 @@ export default function App() {
 
     if (label === '=') {
       if (!expression) return;
-      const result = calculate(expression);
+      let result;
+      if (USE_BACKEND) {
+        result = await calculateViaBackend(expression);
+      } else {
+        result = calculateLocally(expression);
+      }
       setDisplay(result);
       setExpression(result === 'Error' ? '' : result);
       return;

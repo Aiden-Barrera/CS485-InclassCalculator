@@ -2,7 +2,12 @@
   "name": "cs485-calculator",
   "version": "1.0.0",
   "scripts": {
-    "dev": "cd client && npm run dev",
-    "build": "cd client && npm run build"
+    "dev": "concurrently \"cd server && node index.js\" \"cd client && npm run dev\"",
+    "build": "cd client && npm run build",
+    "server": "cd server && node index.js",
+    "client": "cd client && npm run dev"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
   }
 }
