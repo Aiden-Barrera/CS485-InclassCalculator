@@ -1,22 +1,22 @@
 version: 1
-applications:
-  - frontend:
-      phases:
-        preBuild:
-          commands:
-            - cd client && npm install
-        build:
-          commands:
-            - cd client && npm run build
-      artifacts:
-        baseDirectory: client/dist
-        files:
-          - '**/*'
-      cache:
-        paths:
-          - client/node_modules/**/*
-      customHeaders:
-        - pattern: '**/*'
-          headers:
-            - key: Cache-Control
-              value: no-cache
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - echo "=== Node/npm versions ==="
+        - node -v
+        - npm -v
+        - echo "=== Installing dependencies ==="
+        - cd client && npm install
+    build:
+      commands:
+        - echo "=== Building app ==="
+        - npm run build
+        - echo "=== Build complete ==="
+  artifacts:
+    baseDirectory: client/dist
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - client/node_modules/**/*
