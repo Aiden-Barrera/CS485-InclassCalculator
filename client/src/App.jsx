@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import './App.css';
 
-const USE_BACKEND = import.meta.env.VITE_USE_BACKEND === 'true';
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 const BUTTONS = [
   ['Clear', 'Backspace', '%', '÷'],
@@ -11,30 +11,8 @@ const BUTTONS = [
   ['+/-', '0', '.', '='],
 ];
 
-function calculateLocally(expression) {
-  try {
-    const expr = expression
-      .replace(/x/g, '*')
-      .replace(/÷/g, '/')
-      .replace(/%/g, '/100');
-
-    if (!/^[\d\s\+\-\*\/\.\(\)]+$/.test(expr)) return 'Error';
-
-    // eslint-disable-next-line no-new-func
-    const result = Function('"use strict"; return (' + expr + ')')();
-
-    if (!isFinite(result)) return 'Error';
-
-    return Number.isInteger(result)
-      ? String(result)
-      : parseFloat(result.toFixed(10)).toString();
-  } catch {
-    return 'Error';
-  }
-}
-
 async function calculateViaBackend(expression) {
-  const res = await fetch('/api/calculate', {
+  const res = await fetch(`${API_URL}/calculate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ expression }),
@@ -73,12 +51,7 @@ export default function App() {
 
     if (label === '=') {
       if (!expression) return;
-      let result;
-      if (USE_BACKEND) {
-        result = await calculateViaBackend(expression);
-      } else {
-        result = calculateLocally(expression);
-      }
+      const result = await calculateViaBackend(expression);
       setDisplay(result);
       setExpression(result === 'Error' ? '' : result);
       return;
