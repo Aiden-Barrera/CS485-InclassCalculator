@@ -1,0 +1,6 @@
+version: 1
+applications:
+  - appRoot: client
+    apiRoot: api
+    envRoot: .
+    buildSpec: null
