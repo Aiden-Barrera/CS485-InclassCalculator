@@ -2,8 +2,7 @@
   "name": "cs485-calculator",
   "version": "1.0.0",
   "scripts": {
-    "start:server": "cd server && node index.js",
-    "start:client": "cd client && npm run dev",
-    "build:client": "cd client && npm run build"
+    "dev": "cd client && npm run dev",
+    "build": "cd client && npm run build"
   }
 }

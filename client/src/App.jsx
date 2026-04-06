@@ -9,11 +9,33 @@ const BUTTONS = [
   ['+/-', '0', '.', '='],
 ];
 
+function calculate(expression) {
+  try {
+    const expr = expression
+      .replace(/x/g, '*')
+      .replace(/÷/g, '/')
+      .replace(/%/g, '/100');
+
+    if (!/^[\d\s\+\-\*\/\.\(\)]+$/.test(expr)) return 'Error';
+
+    // eslint-disable-next-line no-new-func
+    const result = Function('"use strict"; return (' + expr + ')')();
+
+    if (!isFinite(result)) return 'Error';
+
+    return Number.isInteger(result)
+      ? String(result)
+      : parseFloat(result.toFixed(10)).toString();
+  } catch {
+    return 'Error';
+  }
+}
+
 export default function App() {
   const [expression, setExpression] = useState('');
   const [display, setDisplay] = useState('0');
 
-  async function handleButton(label) {
+  function handleButton(label) {
     if (label === 'Clear') {
       setExpression('');
       setDisplay('0');
@@ -38,19 +60,9 @@ export default function App() {
 
     if (label === '=') {
       if (!expression) return;
-      try {
-        const res = await fetch('http://localhost:3001/calculate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ expression }),
-        });
-        const data = await res.json();
-        setDisplay(data.result);
-        setExpression(data.result === 'Error' ? '' : data.result);
-      } catch {
-        setDisplay('Error');
-        setExpression('');
-      }
+      const result = calculate(expression);
+      setDisplay(result);
+      setExpression(result === 'Error' ? '' : result);
       return;
     }
 
