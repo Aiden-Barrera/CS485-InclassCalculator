@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "cd client && npm run dev",
-    "build": "cd client && npm run build"
+    "build": "cd client && npm run build",
+    "package:lambda": "sh lambda/package.sh"
   }
 }

@@ -8,6 +8,7 @@ const BUTTONS = [
   ['1', '2', '3', '+'],
   ['+/-', '0', '.', '='],
 ];
+const CALCULATE_URL = import.meta.env.VITE_CALCULATE_URL || '/api/calculate';
 
 export default function App() {
   const [expression, setExpression] = useState('');
@@ -16,7 +17,7 @@ export default function App() {
 
   async function calculate(expression) {
     try {
-      const response = await fetch('/api/calculate', {
+      const response = await fetch(CALCULATE_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

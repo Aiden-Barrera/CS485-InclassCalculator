@@ -3,4 +3,6 @@ client/node_modules/
 server/node_modules/
 client/dist/
 client/.env.local
+lambda/dist/
+lambda/calculate-lambda.zip
 .DS_Store
