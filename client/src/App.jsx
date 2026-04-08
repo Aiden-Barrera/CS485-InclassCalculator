@@ -9,33 +9,31 @@ const BUTTONS = [
   ['+/-', '0', '.', '='],
 ];
 
-function calculate(expression) {
-  try {
-    const expr = expression
-      .replace(/x/g, '*')
-      .replace(/÷/g, '/')
-      .replace(/%/g, '/100');
-
-    if (!/^[\d\s+\-*/.()\n]+$/.test(expr)) return 'Error';
-
-    // eslint-disable-next-line no-new-func
-    const result = Function('"use strict"; return (' + expr + ')')();
-
-    if (!isFinite(result)) return 'Error';
-
-    return Number.isInteger(result)
-      ? String(result)
-      : parseFloat(result.toFixed(10)).toString();
-  } catch {
-    return 'Error';
-  }
-}
-
 export default function App() {
   const [expression, setExpression] = useState('');
   const [display, setDisplay] = useState('0');
+  const [isCalculating, setIsCalculating] = useState(false);
 
-  function handleButton(label) {
+  async function calculate(expression) {
+    try {
+      const response = await fetch('/api/calculate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ expression }),
+      });
+
+      if (!response.ok) return 'Error';
+
+      const data = await response.json();
+      return typeof data.result === 'string' ? data.result : 'Error';
+    } catch {
+      return 'Error';
+    }
+  }
+
+  async function handleButton(label) {
     if (label === 'Clear') {
       setExpression('');
       setDisplay('0');
@@ -59,10 +57,12 @@ export default function App() {
     }
 
     if (label === '=') {
-      if (!expression) return;
-      const result = calculate(expression);
+      if (!expression || isCalculating) return;
+      setIsCalculating(true);
+      const result = await calculate(expression);
       setDisplay(result);
       setExpression(result === 'Error' ? '' : result);
+      setIsCalculating(false);
       return;
     }
 
@@ -89,6 +89,7 @@ export default function App() {
             <button
               key={`${r}-${label}`}
               className={buttonClass(label)}
+              disabled={isCalculating && label === '='}
               onClick={() => handleButton(label)}
             >
               {label}
