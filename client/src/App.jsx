@@ -9,6 +9,7 @@ const BUTTONS = [
   ['+/-', '0', '.', '='],
 ];
 const CALCULATE_URL = import.meta.env.VITE_CALCULATE_URL || '/api/calculate';
+console.log('CALCULATE_URL:', CALCULATE_URL);
 
 export default function App() {
   const [expression, setExpression] = useState('');
