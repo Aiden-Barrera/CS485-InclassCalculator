@@ -9,7 +9,6 @@ const BUTTONS = [
   ['+/-', '0', '.', '='],
 ];
 const CALCULATE_URL = import.meta.env.VITE_CALCULATE_URL || '/api/calculate';
-console.log('CALCULATE_URL:', CALCULATE_URL);
 
 export default function App() {
   const [expression, setExpression] = useState('');
@@ -29,7 +28,12 @@ export default function App() {
       if (!response.ok) return 'Error';
 
       const data = await response.json();
-      return typeof data.result === 'string' ? data.result : 'Error';
+      const payload =
+        typeof data.body === 'string'
+          ? JSON.parse(data.body)
+          : data;
+
+      return typeof payload.result === 'string' ? payload.result : 'Error';
     } catch {
       return 'Error';
     }
